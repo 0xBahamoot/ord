@@ -53,7 +53,7 @@ pub(crate) struct Index {
   rpc_url: String,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize)]
 pub(crate) enum List {
   Spent,
   Unspent(Vec<(u64, u64)>),
