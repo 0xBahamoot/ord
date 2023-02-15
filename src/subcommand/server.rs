@@ -650,10 +650,9 @@ impl Server {
   }
 
   async fn inscriptions_from_latest(
-    Extension(page_config): Extension<Arc<PageConfig>>,
     Extension(index): Extension<Arc<Index>>,
   ) -> ServerResult<Json<InscriptionsAPI>> {
-    Self::inscriptions_inner_api(page_config, index, None).await
+    Self::inscriptions_inner_api(index, None).await
   }
 
   async fn range(
