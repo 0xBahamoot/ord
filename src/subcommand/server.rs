@@ -464,12 +464,10 @@ impl Server {
     Path(DeserializeFromStr(sat)): Path<DeserializeFromStr<Sat>>,
   ) -> ServerResult<Json<SatAPI>> {
     let satpoint = index.rare_sat_satpoint(sat)?;
-
-    (index.blocktime(sat.height())?).to_owned();
     Ok(Json(SatAPI {
       sat: (sat),
       satpoint: (satpoint),
-      block: "sdf".to_string(),
+      block: (index.blocktime(sat.height())?).to_owned().to_string(),
       inscription: (index.get_inscription_id_by_sat(sat)?),
     }))
   }
