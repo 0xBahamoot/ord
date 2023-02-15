@@ -464,10 +464,11 @@ impl Server {
     Path(DeserializeFromStr(sat)): Path<DeserializeFromStr<Sat>>,
   ) -> ServerResult<Json<SatAPI>> {
     let satpoint = index.rare_sat_satpoint(sat)?;
+
     Ok(Json(SatAPI {
       sat: (sat),
       satpoint: (satpoint),
-      block: (index.blocktime(sat.height())?).to_owned().to_string(),
+      block: (index.blocktime(sat.height())?).timestamp().to_string(),
       inscription: (index.get_inscription_id_by_sat(sat)?),
     }))
   }
@@ -639,7 +640,7 @@ impl Server {
     index: Arc<Index>,
     from: Option<u64>,
   ) -> ServerResult<Json<InscriptionsAPI>> {
-    let (inscriptions) = index.get_latest_inscriptions(100)?;
+    let inscriptions = index.get_latest_inscriptions(100)?;
     Ok(Json(InscriptionsAPI {
       inscriptions,
       // prev,
