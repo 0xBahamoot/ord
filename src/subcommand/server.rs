@@ -10,7 +10,6 @@ use {
   crate::apis::InscriptionsAPI,
   crate::apis::OutputAPI,
   crate::apis::SatAPI,
-  crate::page_config::PageConfig,
   crate::templates::{
     BlockHtml, ClockSvg, HomeHtml, InputHtml, InscriptionHtml, InscriptionsHtml, OutputHtml,
     PageContent, PageHtml, PreviewAudioHtml, PreviewImageHtml, PreviewPdfHtml, PreviewTextHtml,
@@ -148,7 +147,7 @@ impl Server {
         .route("/content/:inscription_id", get(Self::content))
         .route("/faq", get(Self::faq))
         .route("/favicon.ico", get(Self::favicon))
-        .route("/feed.xml", get(Self::feed))
+        // .route("/feed.xml", get(Self::feed))
         .route("/input/:block/:transaction/:input", get(Self::input))
         .route("/inscription/:inscription_id", get(Self::inscription))
         .route("/inscriptions", get(Self::inscriptions))
@@ -395,7 +394,6 @@ impl Server {
   }
 
   async fn sat_api(
-    Extension(page_config): Extension<Arc<PageConfig>>,
     Extension(index): Extension<Arc<Index>>,
     Path(DeserializeFromStr(sat)): Path<DeserializeFromStr<Sat>>,
   ) -> ServerResult<Json<SatAPI>> {
@@ -409,7 +407,6 @@ impl Server {
   }
 
   async fn inscription_api(
-    Extension(page_config): Extension<Arc<PageConfig>>,
     Extension(index): Extension<Arc<Index>>,
     Path(inscription_id): Path<InscriptionId>,
   ) -> ServerResult<Json<InscriptionAPI>> {
@@ -446,8 +443,8 @@ impl Server {
     let next = index.get_inscription_id_by_inscription_number(entry.number + 1)?;
 
     Ok(Json(InscriptionAPI {
-      chain: (page_config.chain),
-      genesis_fee: (entry.fee),
+      // chain: (page_config.chain),
+      // genesis_fee: (entry.fee),
       genesis_height: (entry.height),
       inscription: (inscription),
       inscription_id: (inscription_id),
@@ -530,7 +527,7 @@ impl Server {
   }
 
   async fn output_api(
-    Extension(page_config): Extension<Arc<PageConfig>>,
+    // Extension(page_config): Extension<Arc<PageConfig>>,
     Extension(index): Extension<Arc<Index>>,
     Path(outpoint): Path<OutPoint>,
   ) -> ServerResult<Json<OutputAPI>> {
@@ -568,14 +565,14 @@ impl Server {
     Ok(Json(OutputAPI {
       outpoint: (outpoint),
       list: (list),
-      chain: (page_config.chain),
+      // chain: (page_config.chain),
       output: (output),
       inscriptions: (inscriptions),
     }))
   }
 
   async fn inscription_index_api(
-    Extension(page_config): Extension<Arc<PageConfig>>,
+    // Extension(page_config): Extension<Arc<PageConfig>>,
     Extension(index): Extension<Arc<Index>>,
     Path(inscription_index): Path<u64>,
   ) -> ServerResult<Json<InscriptionAPI>> {
@@ -616,8 +613,8 @@ impl Server {
     let next = index.get_inscription_id_by_inscription_number(entry.number + 1)?;
 
     Ok(Json(InscriptionAPI {
-      chain: (page_config.chain),
-      genesis_fee: (entry.fee),
+      // chain: (page_config.chain),
+      // genesis_fee: (entry.fee),
       genesis_height: (entry.height),
       inscription: (inscription),
       inscription_id: (inscription_id),
@@ -632,23 +629,23 @@ impl Server {
   }
 
   async fn inscriptions_from_api(
-    Extension(page_config): Extension<Arc<PageConfig>>,
+    // Extension(page_config): Extension<Arc<PageConfig>>,
     Extension(index): Extension<Arc<Index>>,
     Path(from): Path<u64>,
   ) -> ServerResult<Json<InscriptionsAPI>> {
-    Self::inscriptions_inner_api(page_config, index, Some(from)).await
+    Self::inscriptions_inner_api(index, Some(from)).await
   }
 
   async fn inscriptions_inner_api(
-    page_config: Arc<PageConfig>,
+    // page_config: Arc<PageConfig>,
     index: Arc<Index>,
     from: Option<u64>,
   ) -> ServerResult<Json<InscriptionsAPI>> {
-    let (inscriptions, prev, next) = index.get_latest_inscriptions_with_prev_and_next(100, from)?;
+    let (inscriptions) = index.get_latest_inscriptions(100)?;
     Ok(Json(InscriptionsAPI {
       inscriptions,
-      prev,
-      next,
+      // prev,
+      // next,
     }))
   }
 
@@ -829,46 +826,46 @@ impl Server {
     }
   }
 
-  async fn feed(
-    Extension(chain): Extension<Chain>,
-    Extension(index): Extension<Arc<Index>>,
-  ) -> ServerResult<Response> {
-    let mut builder = rss::ChannelBuilder::default();
+  // async fn feed(
+  //   Extension(chain): Extension<Chain>,
+  //   Extension(index): Extension<Arc<Index>>,
+  // ) -> ServerResult<Response> {
+  //   let mut builder = rss::ChannelBuilder::default();
 
-    match chain {
-      Chain::Mainnet => builder.title("Inscriptions"),
-      _ => builder.title(format!("Inscriptions – {chain:?}")),
-    };
+  //   match chain {
+  //     Chain::Mainnet => builder.title("Inscriptions"),
+  //     _ => builder.title(format!("Inscriptions – {chain:?}")),
+  //   };
 
-    builder.generator(Some("ord".to_string()));
+  //   builder.generator(Some("ord".to_string()));
 
-    for (number, id) in index.get_feed_inscriptions(100)? {
-      builder.item(
-        rss::ItemBuilder::default()
-          .title(format!("Inscription {number}"))
-          .link(format!("/inscription/{id}"))
-          .guid(Some(rss::Guid {
-            value: format!("/inscription/{id}"),
-            permalink: true,
-          }))
-          .build(),
-      );
-    }
+  //   for (number, id) in index.get_feed_inscriptions(100)? {
+  //     builder.item(
+  //       rss::ItemBuilder::default()
+  //         .title(format!("Inscription {number}"))
+  //         .link(format!("/inscription/{id}"))
+  //         .guid(Some(rss::Guid {
+  //           value: format!("/inscription/{id}"),
+  //           permalink: true,
+  //         }))
+  //         .build(),
+  //     );
+  //   }
 
-    Ok(
-      (
-        [
-          (header::CONTENT_TYPE, "application/rss+xml"),
-          (
-            header::CONTENT_SECURITY_POLICY,
-            "default-src 'unsafe-inline'",
-          ),
-        ],
-        builder.build().to_string(),
-      )
-        .into_response(),
-    )
-  }
+  //   Ok(
+  //     (
+  //       [
+  //         (header::CONTENT_TYPE, "application/rss+xml"),
+  //         (
+  //           header::CONTENT_SECURITY_POLICY,
+  //           "default-src 'unsafe-inline'",
+  //         ),
+  //       ],
+  //       builder.build().to_string(),
+  //     )
+  //       .into_response(),
+  //   )
+  // }
 
   async fn static_asset(Path(path): Path<String>) -> ServerResult<Response> {
     let content = StaticAssets::get(if let Some(stripped) = path.strip_prefix('/') {

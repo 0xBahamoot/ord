@@ -2,8 +2,8 @@ use {super::*, serde::Serialize};
 
 #[derive(Serialize)]
 pub(crate) struct InscriptionAPI {
-  pub(crate) chain: Chain,
-  pub(crate) genesis_fee: u64,
+  // pub(crate) chain: Chain,
+  // pub(crate) genesis_fee: u64,
   pub(crate) genesis_height: u64,
   pub(crate) inscription: Inscription,
   pub(crate) inscription_id: InscriptionId,
