@@ -640,12 +640,11 @@ impl Server {
     index: Arc<Index>,
     from: Option<u64>,
   ) -> ServerResult<Json<InscriptionsAPI>> {
-    let _ = from;
-    let inscriptions = index.get_latest_inscriptions(100)?;
+    let (inscriptions, prev, next) = index.get_latest_inscriptions_with_prev_and_next(100, from)?;
     Ok(Json(InscriptionsAPI {
       inscriptions,
-      // prev,
-      // next,
+      prev,
+      next,
     }))
   }
 
