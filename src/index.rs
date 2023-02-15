@@ -133,7 +133,7 @@ impl Index {
     let rpc_url = options.rpc_url();
     let cookie_file = options.cookie_file()?;
 
-    let mut auth = Auth::CookieFile(cookie_file.clone());
+    let mut auth = Auth::None;
     let btc_rpc_user = env::var("BTC_RPC_USER")?;
     let btc_rpc_pass = env::var("BTC_RPC_PASS")?;
 
@@ -144,6 +144,7 @@ impl Index {
         btc_rpc_user
       );
     } else {
+      auth = Auth::CookieFile(cookie_file.clone());
       log::info!(
         "Connecting to Bitcoin Core RPC server at {rpc_url} using credentials from `{}`",
         cookie_file.display()
